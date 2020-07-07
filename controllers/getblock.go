@@ -1,6 +1,8 @@
 package controllers
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type BlockNum struct {
 	BlockNumOrID string `json:"block_num_or_id"`
@@ -40,12 +42,11 @@ func getBlockInfo(blockNum string) interface{} {
 	block_num_or_ld := BlockNum{
 		blockNum,
 	}
-
 	params, _ := json.Marshal(block_num_or_ld)
 	body := HttpPost(string(params), "chain", "get_block")
 	json.Unmarshal(body, &res)
 
-	if res.BlockNum == 0 {
+	if res.ID == "" {
 		err := &JSONStruct{201, "No this block_number_or_hash"}
 		return err
 	} else {

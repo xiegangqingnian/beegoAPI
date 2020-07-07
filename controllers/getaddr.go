@@ -43,34 +43,38 @@ type resGetAddr struct {
 	Created         string `json:"created"`
 }
 
-func getAddr(addr *GetAddrController) interface{} {
+func getAddr(addr string) interface{} {
 
-	//var res interface{}
 	var addrResult AddrResult
 	var resGetAddr resGetAddr
-	var account Addr
 
-	data := addr.Ctx.Input.RequestBody
-	err := json.Unmarshal(data, &account)
-	if err != nil {
-		res := JSONStruct{500, "Abnormal data format"}
-		return res
-	}
+	name := Addr{addr}
+	params, _ := json.Marshal(name)
 
-	body := HttpPost(string(data), "chain", "get_account")
+	body := HttpPost(string(params), "chain", "get_account")
 	json.Unmarshal(body, &addrResult)
 
 	if addrResult.AccountName == "" {
 		errRes := &JSONStruct{201, "No this address"}
 		return errRes
 	} else {
-		//fmt.Println(addrResult.AccountName)
-		//fmt.Println("**************")
 		resGetAddr.AccountName = addrResult.AccountName
 		resGetAddr.Current_Balance = addrResult.CoreLiquidBalance
 		resGetAddr.Created = addrResult.Created
-		//	fmt.Println(addrResult.AccountName)
 		return resGetAddr
 	}
+}
 
+func checkAddrExist(addr string) bool {
+	var res interface{}
+	res = getAddr(addr)
+
+	switch res.(type) {
+	case JSONStruct:
+		return false
+	case resGetAddr:
+		return true
+	default:
+		return false
+	}
 }

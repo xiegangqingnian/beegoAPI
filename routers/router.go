@@ -50,6 +50,11 @@ func init() {
 				&controllers.TrxJsonToBinController{},
 			),
 		),
+		beego.NSNamespace("/sendtrx",
+			beego.NSInclude(
+				&controllers.SendTrxController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

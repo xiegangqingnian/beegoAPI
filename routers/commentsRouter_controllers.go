@@ -25,6 +25,15 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["zlt/controllers:GetInfoController"] = append(beego.GlobalControllerRouter["zlt/controllers:GetInfoController"],
+		beego.ControllerComments{
+			Method:           "Get",
+			Router:           "/",
+			AllowHTTPMethods: []string{"GET"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 	beego.GlobalControllerRouter["zlt/controllers:GetTrxController"] = append(beego.GlobalControllerRouter["zlt/controllers:GetTrxController"],
 		beego.ControllerComments{
 			Method:           "Post",
@@ -75,6 +84,15 @@ func init() {
 			Method:           "Delete",
 			Router:           "/:objectId",
 			AllowHTTPMethods: []string{"delete"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["zlt/controllers:SendTrxController"] = append(beego.GlobalControllerRouter["zlt/controllers:SendTrxController"],
+		beego.ControllerComments{
+			Method:           "Post",
+			Router:           "/",
+			AllowHTTPMethods: []string{"POST"},
 			MethodParams:     param.Make(),
 			Filters:          nil,
 			Params:           nil})
