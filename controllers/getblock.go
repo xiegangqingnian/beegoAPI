@@ -26,30 +26,35 @@ type blockInfo struct {
 }
 
 type resBlockInfo struct {
-	HeadBlockNum             int    `json:"current_block_height"`
-	HeadBlockID              string `json:"current_block_hash"`
-	HeadBlockTime            string `json:"current_block_time"`
-	RefBlockPrefix    		 int    `json:"current_block_prefix"`
-	Producer          		 string `json:"current_block_producer"`
+	HeadBlockNum   int    `json:"current_block_height"`
+	HeadBlockID    string `json:"current_block_hash"`
+	HeadBlockTime  string `json:"current_block_time"`
+	RefBlockPrefix int    `json:"current_block_prefix"`
+	Producer       string `json:"current_block_producer"`
 }
 
-func getBlockInfo(blockNum string)  resBlockInfo{
+func getBlockInfo(blockNum string) interface{} {
 
-	var res  blockInfo
-	var resBlockInfo  resBlockInfo
+	var res blockInfo
+	var resBlockInfo resBlockInfo
 	block_num_or_ld := BlockNum{
 		blockNum,
 	}
 
-	params,_:=json.Marshal(block_num_or_ld)
-	body :=HttpPost(string(params),"chain","get_block")
-	json.Unmarshal(body,&res)
+	params, _ := json.Marshal(block_num_or_ld)
+	body := HttpPost(string(params), "chain", "get_block")
+	json.Unmarshal(body, &res)
 
-	resBlockInfo.HeadBlockNum   = res.BlockNum
-	resBlockInfo.HeadBlockID    = res.ID
-	resBlockInfo.HeadBlockTime  = res.Timestamp
-	resBlockInfo.RefBlockPrefix = res.RefBlockPrefix
-	resBlockInfo.Producer       = res.Producer
+	if res.BlockNum == 0 {
+		err := &JSONStruct{201, "No this block_number_or_hash"}
+		return err
+	} else {
+		resBlockInfo.HeadBlockNum = res.BlockNum
+		resBlockInfo.HeadBlockID = res.ID
+		resBlockInfo.HeadBlockTime = res.Timestamp
+		resBlockInfo.RefBlockPrefix = res.RefBlockPrefix
+		resBlockInfo.Producer = res.Producer
 
-	return resBlockInfo
+		return resBlockInfo
+	}
 }

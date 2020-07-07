@@ -28,16 +28,26 @@ func init() {
 		beego.NSNamespace("/info",
 			beego.NSInclude(
 				&controllers.GetInfoController{},
-				),
+			),
 		),
 		beego.NSNamespace("/block",
 			beego.NSInclude(
 				&controllers.GetBlockController{},
-				),
+			),
 		),
 		beego.NSNamespace("/trx",
 			beego.NSInclude(
 				&controllers.GetTrxController{},
+			),
+		),
+		beego.NSNamespace("/addr",
+			beego.NSInclude(
+				&controllers.GetAddrController{},
+			),
+		),
+		beego.NSNamespace("/trxjsontobin",
+			beego.NSInclude(
+				&controllers.TrxJsonToBinController{},
 			),
 		),
 	)
