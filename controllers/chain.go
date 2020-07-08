@@ -37,7 +37,7 @@ type JSONStruct struct {
 }
 
 type blockParams struct {
-	BlockNumOrId string `json:"block_num_or_id"`
+	NumberOrHash string `json:"number_or_hash"`
 }
 
 // @Title GetInfo
@@ -62,13 +62,13 @@ func (blo *GetBlockController) Post() {
 	var blockNumber blockParams
 	data := blo.Ctx.Input.RequestBody
 	err := json.Unmarshal(data, &blockNumber)
-	fmt.Println(blockNumber.BlockNumOrId)
+	fmt.Println(blockNumber.NumberOrHash)
 	if err != nil {
 		error := JSONStruct{201, "Abnormal data format"}
 		blo.Data["json"] = error
 		blo.ServeJSON()
 	}
-	bloInfo := getBlockInfo(blockNumber.BlockNumOrId)
+	bloInfo := getBlockInfo(blockNumber.NumberOrHash)
 
 	blo.Data["json"] = bloInfo
 	blo.Ctx.ResponseWriter.WriteHeader(200)
@@ -103,7 +103,6 @@ func (trx *GetTrxController) Post() {
 // @Failure 403 body is empty
 // @router / [POST]
 func (addr *GetAddrController) Post() {
-
 	var account Addr
 	data := addr.Ctx.Input.RequestBody
 	err := json.Unmarshal(data, &account)
@@ -111,7 +110,7 @@ func (addr *GetAddrController) Post() {
 		res := JSONStruct{500, "Abnormal data format"}
 		addr.Data["json"] = res
 	}
-	addr.Data["json"] = getAddr(account.AccountName)
+	addr.Data["json"] = getAddr(account.Addr)
 	addr.ServeJSON()
 }
 
@@ -149,21 +148,21 @@ func (trx *SendTrxController) Post() {
 		trx.Data["json"] = error
 		trx.ServeJSON()
 	}
-
 	//fmt.Println(params.From,params.Signatures)
-
+	//fmt.Println("****************bool*************")
+	// a := checkAddrExist(params.From)
+	// b := checkAddrExist(params.To)
+	// fmt.Println(a,b)
 	if checkAddrExist(params.From) && checkAddrExist(params.To) {
+		res := sendtrx(params)
+		trx.Data["json"] = res
+		trx.ServeJSON()
+		return
+	} else {
+
 		error := JSONStruct{500, "addr error"}
 		trx.Data["json"] = error
 		trx.ServeJSON()
-	} else {
-
-		sendtrx(params)
-		//fmt.Println(res)
-		//error := JSONStruct{500,"No this from or to address"}
-		//trx.Data["json"] = error
-		//trx.ServeJSON()
-		//return
 	}
 
 	//addr.ServeJSON()

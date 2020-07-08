@@ -24,31 +24,31 @@ type TrxResult struct {
 	Receipt         Receipt       `json:"receipt"`
 	TrxID           string        `json:"trx_id"`
 }
-type authorization struct {
+type Authorization struct {
 	Actor      string `json:"actor"`
 	Permission string `json:"permission"`
 }
 type Data struct {
 	From     string `json:"from"`
+	To       string `json:"to"`
 	Memo     string `json:"memo"`
 	Quantity string `json:"quantity"`
-	To       string `json:"to"`
 }
 type Act struct {
 	Account       string          `json:"account"`
-	Authorization []authorization `json:"authorization"`
+	Name          string          `json:"name"`
+	Authorization []Authorization `json:"authorization"`
 	Data          Data            `json:"data"`
 	HexData       string          `json:"hex_data"`
-	Name          string          `json:"name"`
 }
 type Receipt struct {
-	AbiSequence    int            `json:"abi_sequence"`
+	Receiver       string         `json:"receiver"`
 	ActDigest      string         `json:"act_digest"`
+	GlobalSequence int            `json:"global_sequence"`
+	RecvSequence   int            `json:"recv_sequence"`
 	AuthSequence   []AuthSequence `json:"auth_sequence"`
 	CodeSequence   int            `json:"code_sequence"`
-	GlobalSequence int            `json:"global_sequence"`
-	Receiver       string         `json:"receiver"`
-	RecvSequence   int            `json:"recv_sequence"`
+	AbiSequence    int            `json:"abi_sequence"`
 }
 type AuthSequence struct {
 }
@@ -79,14 +79,7 @@ func getTrx(trxId string) interface{} {
 	if ok {
 		for _, v := range data {
 			switch v2 := v.(type) {
-			case string:
-				//fmt.Println(k,"is string",v2)
-			case int:
-			//	fmt.Println(k,"is int",v2)
-			case bool:
-			//	fmt.Println(k,"is bool",v2)
 			case []interface{}:
-				//fmt.Println(k,"is an array:")
 				for i, iv := range v2 {
 					if i == 1 {
 						res2 = iv
@@ -98,12 +91,11 @@ func getTrx(trxId string) interface{} {
 			}
 		}
 	}
-
-	par, _ := json.Marshal(res2)
-	json.Unmarshal(par, &result)
+	temp, _ := json.Marshal(res2)
+	json.Unmarshal(temp, &result)
 
 	if result.TrxID == "" {
-		err := &JSONStruct{201, "No this address"}
+		err := &JSONStruct{201, "Invalid transaction ID"}
 		return err
 	} else {
 		resGetTrx.TrxID = result.TrxID

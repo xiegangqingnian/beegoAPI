@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-type BlockNum struct {
+type getBlockJson struct {
 	BlockNumOrID string `json:"block_num_or_id"`
 }
 
@@ -39,7 +39,7 @@ func getBlockInfo(blockNum string) interface{} {
 
 	var res blockInfo
 	var resBlockInfo resBlockInfo
-	block_num_or_ld := BlockNum{
+	block_num_or_ld := getBlockJson{
 		blockNum,
 	}
 	params, _ := json.Marshal(block_num_or_ld)
@@ -55,7 +55,6 @@ func getBlockInfo(blockNum string) interface{} {
 		resBlockInfo.HeadBlockTime = res.Timestamp
 		resBlockInfo.RefBlockPrefix = res.RefBlockPrefix
 		resBlockInfo.Producer = res.Producer
-
 		return resBlockInfo
 	}
 }

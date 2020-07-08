@@ -34,32 +34,40 @@ type Permissions struct {
 }
 
 type Addr struct {
+	Addr string `json:"addr"`
+}
+type GetAddrParams struct {
 	AccountName string `json:"account_name"`
 }
 
 type resGetAddr struct {
-	AccountName     string `json:"account_name"`
-	Current_Balance string `json:"current_balance"`
-	Created         string `json:"created"`
+	Addr           string `json:"addr"`
+	CurrentBalance string `json:"current_balance"`
+	Created        string `json:"created"`
 }
 
 func getAddr(addr string) interface{} {
 
 	var addrResult AddrResult
 	var resGetAddr resGetAddr
+	//fmt.Println("******************name************")
+	//fmt.Println(addr)
 
-	name := Addr{addr}
+	name := GetAddrParams{addr}
 	params, _ := json.Marshal(name)
-
+	//fmt.Println("******************params************")
+	//fmt.Println(string(params))
 	body := HttpPost(string(params), "chain", "get_account")
+	//fmt.Println("******************account************")
+	//fmt.Println(string(body))
 	json.Unmarshal(body, &addrResult)
 
 	if addrResult.AccountName == "" {
-		errRes := &JSONStruct{201, "No this address"}
+		errRes := &JSONStruct{201, "Address is empty"}
 		return errRes
 	} else {
-		resGetAddr.AccountName = addrResult.AccountName
-		resGetAddr.Current_Balance = addrResult.CoreLiquidBalance
+		resGetAddr.Addr = addrResult.AccountName
+		resGetAddr.CurrentBalance = addrResult.CoreLiquidBalance
 		resGetAddr.Created = addrResult.Created
 		return resGetAddr
 	}
