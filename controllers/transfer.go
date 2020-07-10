@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type SendTransaction struct {
@@ -37,7 +38,8 @@ type args_0 struct {
 	Memo     string `json:"memo"`
 }
 
-type args_1 struct {
+type ArgsNewTrx struct {
+	ID             int    `json:"id"`
 	From           string `json:"from"`
 	To             string `json:"to"`
 	Quantity       string `json:"quantity"`
@@ -136,7 +138,7 @@ func _trxjsontobin(data transfer) string {
 	return res.Binargs
 }
 
-func sendtrx(params args_1) interface{} {
+func sendtrx(params ArgsNewTrx) interface{} {
 
 	actionData := []args_2{{"zltio.token", "transfer", []Authorization{{params.From, "active"}},
 		params.Data}}
@@ -149,12 +151,15 @@ func sendtrx(params args_1) interface{} {
 		return errRes
 	}
 	body := HttpPost(string(sendDataJson), "chain", "push_transaction")
-	//fmt.Println(string(body))
-	//fmt.Println("**************555*****************")
+
+	return pushTrx(body,)
+}
+
+func pushTrx(body []byte)interface{}{
 
 	var result PushRespon
-	var resGetTrx resGetTrx
 	var error DuplicateTrxErr
+	var resGetTrx resGetTrx
 
 	json.Unmarshal(body, &result)
 	if result.TransactionID == "" {
@@ -176,6 +181,7 @@ func sendtrx(params args_1) interface{} {
 			res := JSONStruct{500, "Invalid packed transaction，expired_tx too far abnormal"}
 			return res
 		default:
+			fmt.Println(result)
 			res := JSONStruct{500, "other abnormal"}
 			return res
 		}
@@ -184,8 +190,6 @@ func sendtrx(params args_1) interface{} {
 		resGetTrx.Time = result.Processed.BlockTime
 		resGetTrx.BlockHeight = result.Processed.BlockNum
 		resGetTrx.Data = result.Processed.ActionTraces[0].Act.Data
-
 		return resGetTrx
 	}
-	return nil
 }

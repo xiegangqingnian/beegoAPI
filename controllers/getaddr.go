@@ -50,8 +50,6 @@ func getAddr(addr string) interface{} {
 
 	var addrResult AddrResult
 	var resGetAddr resGetAddr
-	//fmt.Println("******************name************")
-	//fmt.Println(addr)
 
 	name := GetAddrParams{addr}
 	params, _ := json.Marshal(name)
@@ -63,9 +61,11 @@ func getAddr(addr string) interface{} {
 	json.Unmarshal(body, &addrResult)
 
 	if addrResult.AccountName == "" {
+	//fmt.Println("here***********************************")
 		errRes := &JSONStruct{201, "Address is empty"}
 		return errRes
 	} else {
+	//fmt.Println("this***********************************")
 		resGetAddr.Addr = addrResult.AccountName
 		resGetAddr.CurrentBalance = addrResult.CoreLiquidBalance
 		resGetAddr.Created = addrResult.Created
@@ -73,10 +73,11 @@ func getAddr(addr string) interface{} {
 	}
 }
 
+// 存在返回 true
 func checkAddrExist(addr string) bool {
+
 	var res interface{}
 	res = getAddr(addr)
-
 	switch res.(type) {
 	case JSONStruct:
 		return false

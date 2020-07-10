@@ -4,15 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"zlt/models"
 )
 
-var chain_url = "http://47.92.208.227:8888"
-
+var chain_url = "http://121.196.15.20:8888"
+var wallet_url= "http://121.196.15.20:8900"
 type GetInfoController struct {
 	beego.Controller
 }
 
 type GetBlockController struct {
+	beego.Controller
+}
+
+type GetBlocksController struct {
 	beego.Controller
 }
 
@@ -27,6 +32,15 @@ type GetAddrController struct {
 type TrxJsonToBinController struct {
 	beego.Controller
 }
+
+type NewAddrController struct {
+	beego.Controller
+}
+
+type TrxHeightController struct {
+	beego.Controller
+}
+
 type SendTrxController struct {
 	beego.Controller
 }
@@ -40,6 +54,11 @@ type blockParams struct {
 	NumberOrHash string `json:"number_or_hash"`
 }
 
+type blocksParams struct {
+	Start int `json:"start"`
+	End   int `json:"end"`
+}
+
 // @Title GetInfo
 // @Description create users
 // @Param	body		body 		true		"body for user content"
@@ -50,6 +69,18 @@ func (u *GetInfoController) Get() {
 	resInfo := getInfo()
 	u.Data["json"] = resInfo
 	u.ServeJSON()
+}
+
+// @Title GetTrxNumber
+// @Description search
+// @Param	body		body 		true  " body for user"
+// @Success 200 {int} models.User.Id
+// @Failure 403 body is empty
+// @router / [GET]
+func (t *TrxHeightController) Get() {
+	res:=models.Search()
+	t.Data["json"]=res
+	t.ServeJSON()
 }
 
 // @Title GetBlock
@@ -74,6 +105,31 @@ func (blo *GetBlockController) Post() {
 	blo.Ctx.ResponseWriter.WriteHeader(200)
 	blo.ServeJSON()
 }
+
+// @Title GetBlocks
+// @Description search blocks
+// @Param	body	body 	blockNumber	 	"body for blockNumber"
+// @Success 200 {int} models.User.Id
+// @Failure 403 body is empty
+// @router / [POST]
+func (blo *GetBlocksController) Post() {
+	var blocksNumber blocksParams
+	data := blo.Ctx.Input.RequestBody
+	json.Unmarshal(data, &blocksNumber)
+	fmt.Println("11111111111111111111111111111111")
+	fmt.Println(blocksNumber.Start)
+	fmt.Println(blocksNumber.End)
+	if(blocksNumber.Start>blocksNumber.End){
+		err := JSONStruct{500,"Abnormal data format"}
+		blo.Data["json"] = err
+		blo.ServeJSON()
+	}
+	bloInfo := getBlocksInfo(blocksNumber)
+	blo.Data["json"] = bloInfo
+	blo.ServeJSON()
+}
+
+
 
 // @Title GetTrx
 // @Description create users
@@ -132,6 +188,20 @@ func (addr *TrxJsonToBinController) Post() {
 	addr.Data["json"] = trxjsontobin(params)
 	addr.ServeJSON()
 }
+// @Title NewAddrJsonToBin
+// @Description create users
+// @Param	body	body 	addr	true		"body for new addr"
+// @Success 200 {int} models.User.Id
+// @Failure 403 body is empty
+// @router / [POST]
+func (n *NewAddrController) Post() {
+	var params NewAddrParams
+	data := n.Ctx.Input.RequestBody
+	json.Unmarshal(data, &params)
+	n.Data["json"] = signNewAddr(params)
+	n.ServeJSON()
+}
+
 
 // @Title SendTrx
 // @Description send trx
@@ -140,7 +210,7 @@ func (addr *TrxJsonToBinController) Post() {
 // @Failure 403 body is empty
 // @router / [POST]
 func (trx *SendTrxController) Post() {
-	var params args_1
+	var params ArgsNewTrx
 	data := trx.Ctx.Input.RequestBody
 	err := json.Unmarshal(data, &params)
 	if err != nil {
@@ -148,22 +218,15 @@ func (trx *SendTrxController) Post() {
 		trx.Data["json"] = error
 		trx.ServeJSON()
 	}
-	//fmt.Println(params.From,params.Signatures)
-	//fmt.Println("****************bool*************")
-	// a := checkAddrExist(params.From)
-	// b := checkAddrExist(params.To)
-	// fmt.Println(a,b)
+
 	if checkAddrExist(params.From) && checkAddrExist(params.To) {
 		res := sendtrx(params)
 		trx.Data["json"] = res
 		trx.ServeJSON()
 		return
 	} else {
-
 		error := JSONStruct{500, "addr error"}
 		trx.Data["json"] = error
 		trx.ServeJSON()
 	}
-
-	//addr.ServeJSON()
 }

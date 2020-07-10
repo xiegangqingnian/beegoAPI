@@ -60,6 +60,14 @@ type resGetTrx struct {
 	Data        Data   `json:"data"`
 }
 
+type resGettrxaddr struct {
+	TrxID         string 		`json:"trx_id"`
+	BlockHeight    int    		`json:"block_height"`
+	Time           string 		`json:"time"`
+	Addr       	   string	    `json:"addr"`
+	CurrentBalance string       `json:"current_balance"`
+}
+
 func getTrx(trxId string) interface{} {
 
 	var res interface{}

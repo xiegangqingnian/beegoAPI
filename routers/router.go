@@ -35,6 +35,11 @@ func init() {
 				&controllers.GetBlockController{},
 			),
 		),
+		beego.NSNamespace("/blocks",
+			beego.NSInclude(
+				&controllers.GetBlocksController{},
+			),
+		),
 		beego.NSNamespace("/trx",
 			beego.NSInclude(
 				&controllers.GetTrxController{},
@@ -50,9 +55,19 @@ func init() {
 				&controllers.TrxJsonToBinController{},
 			),
 		),
+		beego.NSNamespace("/newaddr",
+			beego.NSInclude(
+				&controllers.NewAddrController{},
+			),
+		),
 		beego.NSNamespace("/sendtrx",
 			beego.NSInclude(
 				&controllers.SendTrxController{},
+			),
+		),
+		beego.NSNamespace("/trxheight",
+			beego.NSInclude(
+				&controllers.TrxHeightController{},
 			),
 		),
 	)

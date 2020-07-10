@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 )
 
 type getBlockJson struct {
@@ -33,6 +35,7 @@ type resBlockInfo struct {
 	HeadBlockTime  string `json:"current_block_time"`
 	RefBlockPrefix int    `json:"current_block_prefix"`
 	Producer       string `json:"current_block_producer"`
+	Transactions   []interface{} `json:"transactions"`
 }
 
 func getBlockInfo(blockNum string) interface{} {
@@ -45,7 +48,6 @@ func getBlockInfo(blockNum string) interface{} {
 	params, _ := json.Marshal(block_num_or_ld)
 	body := HttpPost(string(params), "chain", "get_block")
 	json.Unmarshal(body, &res)
-
 	if res.ID == "" {
 		err := &JSONStruct{201, "No this block_number_or_hash"}
 		return err
@@ -57,4 +59,40 @@ func getBlockInfo(blockNum string) interface{} {
 		resBlockInfo.Producer = res.Producer
 		return resBlockInfo
 	}
+}
+
+func getBlocksInfo(params blocksParams) interface{} {
+
+	var res blockInfo
+	var resblockInfo []resBlockInfo
+	number := params.End - params.Start
+	fmt.Println("************start and  end*********")
+	fmt.Println(params.Start)
+	fmt.Println(params.End)
+	for i:=0;i<=number;i++{
+		block_num_or_ld := getBlockJson{
+			strconv.Itoa(params.Start+i),
+		}
+		fmt.Println("params.Start+i")
+		fmt.Println(params.Start+i)
+		fmt.Println("strconv.Itoa(params.Start+i)")
+		fmt.Println(strconv.Itoa(params.Start+i))
+		par, _ := json.Marshal(block_num_or_ld)
+		fmt.Println("**************")
+		fmt.Println("*****par******")
+		fmt.Println(string(par))
+		body := HttpPost(string(par), "chain", "get_block")
+
+		json.Unmarshal(body, &res)
+
+		if res.ID == "" {
+			err := &JSONStruct{201, "No this block_number_or_hash"}
+			return err
+		} else {
+			tmp :=resBlockInfo{res.BlockNum,res.ID,res.Timestamp,
+				res.RefBlockPrefix,res.Producer,res.Transactions}
+			resblockInfo = append(resblockInfo,tmp)
+		}
+	}
+	return resblockInfo
 }
